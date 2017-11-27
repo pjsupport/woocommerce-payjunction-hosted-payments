@@ -51,6 +51,10 @@ function payjunction_hp_init() {
             $this->sb_apilogin          = $this->settings[ 'sb_apilogin'    ];
             $this->sb_apipassword       = $this->settings[ 'sb_apipassword' ];
             
+	        $this->view_transaction_url = $this->testmode
+                ? "https://d1.www.payjunctionlabs.com/trinity/vt#/transactions/%s/view"
+		        : "https://www.payjunction.com/trinity/vt#/transactions/%s/view";
+		
             // Instantiate the callback handler. It will hook itself into the WC callback API through 
             // it's constructor
             $this->response_handler     = new WC_Gateway_PayJunction_Response( $this->apilogin, $this->apipassword, $this->customerror,
