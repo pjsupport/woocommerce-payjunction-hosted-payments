@@ -1,14 +1,7 @@
 <?php
 
-/*require_once(dirname(__FILE__) . './wc-payjunction-hosted-payments-gateway.php');
-require_once(dirname(__FILE__) . './wc-payjunction-hosted-payments-tools.php');
-require_once(dirname(__FILE__) . './wc-payjunction-hosted-payments-rest-api.php');*/
-
 class WC_Gateway_PayJunction_Response {
-    
-    const PJ_APP_KEY = '3028e3b4-08f8-4f68-8393-570d382e2a24';
-    const PJ_LABS_APP_KEY = 'a8856bf2-e44b-47dc-8577-4ff74dc9e7af';
-    
+
     function __construct($apilogin, $apipassword, $customerror, $pjlabs = false, $sandbox_apilogin = '', $sandbox_apipassword = '', $debugging = false) {
         
         $this->version              = WC_PayJunction_HP::VERSION;
