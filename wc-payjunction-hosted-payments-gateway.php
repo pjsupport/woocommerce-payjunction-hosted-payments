@@ -155,6 +155,8 @@ function payjunction_hp_init() {
                 
                 if ( $this->debugging )
                     PayJunction_Tools::log_debug( "Order #$order->id created" );
+                if ( $this->testmode ) 
+                    $order->add_order_note("TEST TRANSACTION on PJLABS");
                 
                 $this->set_transaction_mode_on_order( $order );
                 $payment_link = $this->generate_hosted_payment_link( $order );
