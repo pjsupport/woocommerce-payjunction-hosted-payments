@@ -287,8 +287,7 @@ function payjunction_hp_init() {
         }
         
         function get_relay_url($order) {
-            //return array( 'relay' => WC()->api_request_url( strtolower( get_class( $this->response_handler ) ) ) );
-            return array( 'relay' => 'http://wp-wc-hosted-payments-pjsupport.c9users.io/wc-api/wc_gateway_payjunction_response/' );
+            return array( 'relay' => WC()->api_request_url( strtolower( get_class( $this->response_handler ) ) ) );
         }
         
         static function get_billing_query_array( $order ) {
