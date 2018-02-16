@@ -270,7 +270,8 @@ function payjunction_hp_init() {
         }
         
         function get_relay_url($order) {
-            return array( 'relay' => WC()->api_request_url( strtolower( get_class( $this->response_handler ) ) ) );
+            //return array( 'relay' => WC()->api_request_url( strtolower( get_class( $this->response_handler ) ) ) );
+            return array( 'relay' => 'http://wp-wc-hosted-payments-pjsupport.c9users.io/wc-api/wc_gateway_payjunction_response/' );
         }
         
         static function get_billing_query_array( $order ) {
@@ -363,7 +364,7 @@ function payjunction_hp_init() {
             $amount_shipping = (float)$order->get_total_shipping();
             if ($amount_shipping) {
                 $query_array[ 'need_to_ship'    ] = 'Yes';
-                $query_array[ 's_h_amount'       ] = number_format($amount_shipping, 2, '.', '');
+                $query_array[ 's_h_amount'      ] = number_format($amount_shipping, 2, '.', '');
             }
             return $query_array;
             

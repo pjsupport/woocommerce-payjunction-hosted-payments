@@ -19,13 +19,26 @@ class WC_Gateway_PayJunction_Response {
     }
     
     function process_response() {
-        
+        $data = array();
+        if (!empty($_POST)) {
+            $data = $_POST;
+        } else {
+            $data = $_GET;
+            if ($this->debugging) {
+                PayJunction_Tools::log_debug("POST body was empty, trying to process from GET parameters");
+            }
+        }
+            
+        if ($this->debugging) {
+            PayJunction_Tools::log_debug("Connection received on callback endpoint");
+            PayJunction_Tools::log_debug("\n" . implode($data, ""));
+        }
         try {
             
-            if ( self::valid_relay_response( $_POST ) ) {
+            if ( self::valid_relay_response( $data ) ) {
                 
-                $transactionId  = $_POST[ 'qs_tracking_code' ];
-                $order          = wc_get_order($_POST['wcOrderId']);
+                $transactionId  = $data[ 'qs_tracking_code' ];
+                $order          = wc_get_order($data['wcOrderId']);
                 
                 if ( $this->verify_amount_via_api( $transactionId, $order->get_total() ) ) {
                     // Lines up, we are good to go
@@ -50,8 +63,8 @@ class WC_Gateway_PayJunction_Response {
     
     static function valid_relay_response( $response ) {
         // Verify the information we need is in the response
-        return  self::has_valid_transaction_id( $_POST ) &&
-                self::has_valid_order_id( $_POST );
+        return  self::has_valid_transaction_id( $response ) &&
+                self::has_valid_order_id( $response );
     }
     
     static function has_valid_transaction_id( $post_object ) {
@@ -75,6 +88,11 @@ class WC_Gateway_PayJunction_Response {
     function verify_amount_via_api( $transactionId, $amount ) {
         $conn = $this->get_api_instance( $this->pjlabs );
         $api_amount = $conn->get_transaction_details( $transactionId )->amountTotal;
+        
+        if ($this->debugging) {
+            PayJunction_Tools::log_debug("Validating amounts: WC Order: $amount === API: $api_amount?");
+        }
+        
         return number_format( (float)$amount, 2, '.', '' ) === number_format( (float)$api_amount, 2, '.', '' );
     }
 }

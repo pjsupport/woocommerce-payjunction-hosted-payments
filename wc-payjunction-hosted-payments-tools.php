@@ -1,5 +1,9 @@
 <?php 
 
+if ( ! defined( 'ABSPATH' )) {
+    exit;
+}
+
 class PayJunction_Tools {
 
     const LOG_ERROR_TYPE = 'error';
@@ -9,7 +13,6 @@ class PayJunction_Tools {
     public static function log_message( $file, $message ) {
         $line_to_write = self::format_message_with_timestamp( $message );
         try {
-            if ( ! defined( 'ABSPATH' ) ) throw new ErrorException( 'ABSPATH is not defined, cannot determine log file location! Printing to STDOUT as a backup' );
             $fsize = filesize( $file );
             // truncate the log file to zero bytes if it is already 1 MB or larger
             $log = $fsize < self::LOG_MAX_BYTES ? fopen( $file, 'a' ) : fopen( $file, 'w' );
