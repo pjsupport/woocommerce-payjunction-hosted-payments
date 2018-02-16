@@ -35,6 +35,7 @@ function payjunction_hp_init() {
             $this->method_description = 'Processes payments via the Hosted Payments service by PayJunction';
             $this->order_button_text = 'Make Payment';
             $this->slug = 'woocommerce-payjunction-hosted-payments';
+            $this->log_settings_key = "wc_" . $this->slug . "_debug";
             $this->init_form_fields();
             $this->addLinkToLog();
             $this->init_settings();
@@ -51,7 +52,7 @@ function payjunction_hp_init() {
             $this->sb_apilogin          = $this->settings[ 'sb_apilogin'    ];
             $this->sb_apipassword       = $this->settings[ 'sb_apipassword' ];
             
-            $this->debugging = $this->wc_woocommerce_payjunction_hosted_payments_debug = $this->settings[ 'wc_woocommerce-payjunction-hosted-payments_debug' ] === 'yes' ? true : false;
+            $this->debugging = $this->wc_woocommerce_payjunction_hosted_payments_debug = $this->settings[ $this->log_settings_key ] === 'yes' ? true : false;
             
 	        $this->view_transaction_url = $this->testmode
                 ? "https://d1.www.payjunctionlabs.com/trinity/vt#/transactions/%s/view"
@@ -145,7 +146,6 @@ function payjunction_hp_init() {
         function addLinkToLog() {
             $label = __( 'Enable Logging', 'woothemes' );
             $description = __( 'Enable the logging of errors.', 'woothemes' );
-            $form_key = "wc_" . $this->slug . "_debug";
             if ( defined( 'WC_LOG_DIR' ) ) {
             	$log_url = add_query_arg( 'tab', 'logs', add_query_arg( 'page', 'wc-status', admin_url( 'admin.php' ) ) );
             	$log_key = $this->slug . '-' . sanitize_file_name( wp_hash( $this->slug ) ) . '-log';
@@ -154,7 +154,7 @@ function payjunction_hp_init() {
             	$label .= ' | ' . sprintf( __( '%1$sView Log%2$s', 'woothemes' ), '<a href="' . esc_url( $log_url ) . '">', '</a>' );
             }
             
-            $this->form_fields[$form_key] = array(
+            $this->form_fields[$this->log_settings_key] = array(
             	'title'       => __( 'Debug Log', 'woothemes' ),
             	'label'       => $label,
             	'description' => $description,

@@ -31,7 +31,7 @@ class WC_Gateway_PayJunction_Response {
             
         if ($this->debugging) {
             PayJunction_Tools::log_debug("Connection received on callback endpoint");
-            PayJunction_Tools::log_debug("\n" . implode($data, ""));
+            PayJunction_Tools::log_debug("\n" . wc_print_r($data, true));
         }
         try {
             
