@@ -34,8 +34,9 @@ function payjunction_hp_init() {
             $this->method_title = 'PayJunction Hosted Payments';
             $this->method_description = 'Processes payments via the Hosted Payments service by PayJunction';
             $this->order_button_text = 'Make Payment';
-            
+            $this->slug = 'woocommerce-payjunction-hosted-payments';
             $this->init_form_fields();
+            $this->addLinkToLog();
             $this->init_settings();
             
             $this->shopname             = $this->settings[ 'shopname'       ];
@@ -45,11 +46,12 @@ function payjunction_hp_init() {
             $this->testmode             = $this->settings[ 'testmode'       ] === 'yes' ? true :false;
             $this->description          = $this->settings[ 'description'    ];
             $this->pay_desc             = $this->settings[ 'pay_desc'       ];
-            $this->debugging            = $this->settings[ 'debugging'      ] === 'yes' ? true : false;
             $this->apilogin             = $this->settings[ 'apilogin'       ];
             $this->apipassword          = $this->settings[ 'apipassword'    ];
             $this->sb_apilogin          = $this->settings[ 'sb_apilogin'    ];
             $this->sb_apipassword       = $this->settings[ 'sb_apipassword' ];
+            
+            $this->debugging = $this->wc_woocommerce_payjunction_hosted_payments_debug = $this->settings[ 'wc_woocommerce-payjunction-hosted-payments_debug' ] === 'yes' ? true : false;
             
 	        $this->view_transaction_url = $this->testmode
                 ? "https://d1.www.payjunctionlabs.com/trinity/vt#/transactions/%s/view"
@@ -79,12 +81,6 @@ function payjunction_hp_init() {
                     'description'       => 'Enable this mode to prevent live processing of credit cards for testing purposes',
                     'type'              => 'checkbox',
                     'default'           => 'no'),
-                'debugging'         => array(
-                	'title'             => 'Enable Debugging Mode',
-                	'description'       => 'Enabling this option causes extra information to be logged in a payjunctionDebug.log file in the root'
-                	                    . ' directory of the Wordpress install.',
-                	'type'              => 'checkbox',
-                	'default'           => 'no'),
                 'shopname'          => array(
                     'title'             => 'Production Hosted Payments Shop Name',
                     'description'       => 'Please see our guide <a target="_blank" href="https://support.payjunction.com/hc/en-us/articles/115000089613-How-Do-I-Manage-My-Hosted-Payment-Shops-">here</a>'
@@ -143,6 +139,27 @@ function payjunction_hp_init() {
                 	                    . ' to only fetch the total amount for the order and not attempt to break down the tax and shipping.',
                 	'type'              => 'checkbox',
                 	'default'           => 'no')
+            );
+        }
+        
+        function addLinkToLog() {
+            $label = __( 'Enable Logging', 'woothemes' );
+            $description = __( 'Enable the logging of errors.', 'woothemes' );
+            $form_key = "wc_" . $this->slug . "_debug";
+            if ( defined( 'WC_LOG_DIR' ) ) {
+            	$log_url = add_query_arg( 'tab', 'logs', add_query_arg( 'page', 'wc-status', admin_url( 'admin.php' ) ) );
+            	$log_key = $this->slug . '-' . sanitize_file_name( wp_hash( $this->slug ) ) . '-log';
+            	$log_url = add_query_arg( 'log_file', $log_key, $log_url );
+            
+            	$label .= ' | ' . sprintf( __( '%1$sView Log%2$s', 'woothemes' ), '<a href="' . esc_url( $log_url ) . '">', '</a>' );
+            }
+            
+            $this->form_fields[$form_key] = array(
+            	'title'       => __( 'Debug Log', 'woothemes' ),
+            	'label'       => $label,
+            	'description' => $description,
+            	'type'        => 'checkbox',
+            	'default'     => 'no'
             );
         }
         
