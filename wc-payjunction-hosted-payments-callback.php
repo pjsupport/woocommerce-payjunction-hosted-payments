@@ -19,6 +19,9 @@ class WC_Gateway_PayJunction_Response {
     }
     
     function process_response() {
+        if ($this->debugging) {
+            PayJunction_Tools::log_debug("Connection received on callback URL");
+        }
         $data = array();
         if (!empty($_POST)) {
             $data = $_POST;
@@ -30,7 +33,7 @@ class WC_Gateway_PayJunction_Response {
         }
             
         if ($this->debugging) {
-            PayJunction_Tools::log_debug("Connection received on callback endpoint");
+            PayJunction_Tools::log_debug("Data received:");
             PayJunction_Tools::log_debug("\n" . wc_print_r($data, true));
         }
         try {
