@@ -45,10 +45,14 @@ class WC_Gateway_PayJunction_Response {
                 
                 if ( $this->verify_amount_via_api( $transactionId, $order->get_total() ) ) {
                     // Lines up, we are good to go
-                    update_post_meta( $order->id, '_transaction_id', $transactionId );
+                    update_post_meta( $order->get_id(), '_transaction_id', $transactionId );
                     $order->payment_complete( $transactionId );
                     wp_redirect( WC_Payment_Gateway::get_return_url( $order ) );
                     exit;
+                } else {
+                    $api_amount = $this->get_transaction_amount_via_api( $transactionId );
+                    $order_total = $order->get_total();
+                    throw new ErrorException("Amount from WC order ($order_total) does not match total from transaction in PayJunction ($api_amount)");
                 }
                 
             } else {
@@ -88,9 +92,13 @@ class WC_Gateway_PayJunction_Response {
         }
     }
     
-    function verify_amount_via_api( $transactionId, $amount ) {
+    function get_transaction_amount_via_api( $transactionId ) {
         $conn = $this->get_api_instance( $this->pjlabs );
-        $api_amount = $conn->get_transaction_details( $transactionId )->amountTotal;
+        return $conn->get_transaction_details( $transactionId )->amountTotal;
+    }
+    
+    function verify_amount_via_api( $transactionId, $amount ) {
+        $api_amount = $this->get_transaction_amount_via_api( $transactionId );
         
         if ($this->debugging) {
             PayJunction_Tools::log_debug("Validating amounts: WC Order: $amount === API: $api_amount?");

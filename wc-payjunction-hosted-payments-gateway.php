@@ -21,7 +21,7 @@ add_action( 'plugins_loaded', 'payjunction_hp_init', 0 );
 function payjunction_hp_init() {
     class WC_PayJunction_HP extends WC_Payment_Gateway {
         
-        const VERSION = "1.0.4";
+        const VERSION = "1.0.5";
         
         const PJ_TESTMODE_META_KEY = '_pj_hp_test_mode';
         const PJ_TESTMODE_TRUE = 'labs';
@@ -51,7 +51,7 @@ function payjunction_hp_init() {
             $this->apipassword          = $this->settings[ 'apipassword'    ];
             $this->sb_apilogin          = $this->settings[ 'sb_apilogin'    ];
             $this->sb_apipassword       = $this->settings[ 'sb_apipassword' ];
-            $this->simpleamounts        = $this->settings[ 'simpleamounts'  ];
+            $this->simpleamounts        = $this->settings[ 'simpleamounts'  ] === 'yes' ? true : false;
             
             $this->debugging = $this->wc_woocommerce_payjunction_hosted_payments_debug = $this->settings[ $this->log_settings_key ] === 'yes' ? true : false;
             
@@ -171,8 +171,10 @@ function payjunction_hp_init() {
                 
                 $order = new WC_Order( $order_id );
                 
-                if ( $this->debugging )
-                    PayJunction_Tools::log_debug( "Order #$order->id created" );
+                if ( $this->debugging ) {
+                    $created_order_id = $order->get_id();
+                    PayJunction_Tools::log_debug( "Order #$created_order_id created" );
+                }
                 if ( $this->testmode ) 
                     $order->add_order_note("TEST TRANSACTION on PJLABS");
                 
