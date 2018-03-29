@@ -51,6 +51,7 @@ function payjunction_hp_init() {
             $this->apipassword          = $this->settings[ 'apipassword'    ];
             $this->sb_apilogin          = $this->settings[ 'sb_apilogin'    ];
             $this->sb_apipassword       = $this->settings[ 'sb_apipassword' ];
+            $this->simpleamounts        = $this->settings[ 'simpleamounts'  ];
             
             $this->debugging = $this->wc_woocommerce_payjunction_hosted_payments_debug = $this->settings[ $this->log_settings_key ] === 'yes' ? true : false;
             
