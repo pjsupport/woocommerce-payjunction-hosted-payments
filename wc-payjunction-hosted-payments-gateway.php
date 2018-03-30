@@ -374,7 +374,7 @@ function payjunction_hp_init() {
                 
             }
             
-            return $querry_array;
+            return $query_array;
             
         }
         
