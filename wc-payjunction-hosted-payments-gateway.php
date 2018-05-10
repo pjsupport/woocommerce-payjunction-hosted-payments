@@ -2,7 +2,7 @@
 /*
 Plugin Name: PayJunction Hosted Payments Gateway Module for WooCommerce
 Description: Credit Card Processing Module for WooCommerce using the PayJunction Hosted Payments service
-Version: 1.0.4
+Version: 1.0.5
 Plugin URI: https://company.payjunction.com/support/WooCommerce
 Author: Matthew E. Cooper
 Author URI: https://www.payjunction.com
@@ -343,10 +343,16 @@ function payjunction_hp_init() {
         }
         
         function get_amounts_query_array( $order ) {
-            
             $query_array = array();
             if ( ! $this->simpleamounts ) {
-                $query_array[ 'price' ] = number_format( (float)$order->get_subtotal(), 2, '.', '' );
+                $subtotal = (float)$order->get_subtotal();
+                // Need to apply the discount if it exists
+                $discount_amount = (float)$order->get_total_discount();
+                $subtotal_with_discount = number_format(($subtotal - round($discount_amount, 2)), 2, '.', '');
+                
+                if ($this->debugging) PayJunction_Tools::log_debug("Subtotal: $subtotal\nDiscount: $discount_amount\nSubtotal with the discount applied: $subtotal_with_discount");
+                
+                $query_array[ 'price' ] = $subtotal_with_discount;
                 self::set_amount_shipping( $query_array, $order );
                 self::set_amount_tax( $query_array, $order );
             } else {
