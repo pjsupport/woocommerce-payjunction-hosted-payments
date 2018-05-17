@@ -2,7 +2,7 @@
 /*
 Plugin Name: PayJunction Hosted Payments Gateway Module for WooCommerce
 Description: Credit Card Processing Module for WooCommerce using the PayJunction Hosted Payments service
-Version: 1.0.6
+Version: 1.0.7
 Plugin URI: https://company.payjunction.com/support/WooCommerce
 Author: Matthew E. Cooper
 Author URI: https://www.payjunction.com
@@ -21,7 +21,7 @@ add_action( 'plugins_loaded', 'payjunction_hp_init', 0 );
 function payjunction_hp_init() {
     class WC_PayJunction_HP extends WC_Payment_Gateway {
         
-        const VERSION = "1.0.6";
+        const VERSION = "1.0.7";
         
         const PJ_TESTMODE_META_KEY = '_pj_hp_test_mode';
         const PJ_TESTMODE_TRUE = 'labs';
@@ -64,7 +64,7 @@ function payjunction_hp_init() {
             $this->response_handler     = new WC_Gateway_PayJunction_Response( $this->apilogin, $this->apipassword, $this->customerror,
                 $this->testmode, $this->sb_apilogin, $this->sb_apipassword, $this->debugging );
                 
-            // Add a message to the title when in testing mode
+            // Add a message to the description when in testing mode
             if ($this->testmode) $this->description = '<p><span style="color:red; font-weight:bold">*TEST MODE*</span></p>'.
                 '<p><span style="color:red; font-weight:bold">Transactions will be processed on the sandbox server at PayJunctionLabs.com</span></p>' . $this->description;
             
