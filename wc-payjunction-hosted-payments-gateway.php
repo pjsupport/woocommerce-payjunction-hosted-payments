@@ -63,6 +63,10 @@ function payjunction_hp_init() {
             // it's constructor
             $this->response_handler     = new WC_Gateway_PayJunction_Response( $this->apilogin, $this->apipassword, $this->customerror,
                 $this->testmode, $this->sb_apilogin, $this->sb_apipassword, $this->debugging );
+                
+            // Add a message to the title when in testing mode
+            if ($this->testmode) $this->description = '<p><span style="color:red; font-weight:bold">*TEST MODE*</span></p>'.
+                '<p><span style="color:red; font-weight:bold">Transactions will be processed on the sandbox server at PayJunctionLabs.com</span></p>' . $this->description;
             
             add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
         }
@@ -128,7 +132,7 @@ function payjunction_hp_init() {
                     'title'             => 'Payment Option Description',
                     'description'       => 'Description of the payment method for the customer at checkout',
                     'type'              => 'textarea',
-                    'default'           => 'Secure hosted checkout page provided by <a target="_blank" href="https://www.payjunction.com">PayJunction</a>' 
+                    'default'           => 'Secure hosted checkout page provided by <a target="_blank" href="https://www.payjunction.com">PayJunction.</a>' 
                                         . ' Once payment is complete, you will be redirected back to the store.'),
                 'customerror'       => array(
                     'title'             => 'Custom Error Message',
