@@ -18,24 +18,12 @@ class WC_Gateway_PayJunction_Response {
         
     }
     
-    function process_response() {
-        if ($this->debugging) {
-            PayJunction_Tools::log_debug("Connection received on callback URL");
-        }
-        $data = array();
-        if (!empty($_POST)) {
-            $data = $_POST;
-        } else {
-            $data = $_GET;
-            if ($this->debugging) {
-                PayJunction_Tools::log_debug("POST body was empty, trying to process from GET parameters");
-            }
-        }
-            
-        if ($this->debugging) {
-            PayJunction_Tools::log_debug("Data received:");
-            PayJunction_Tools::log_debug("\n" . wc_print_r($data, true));
-        }
+    function process_signature_webhook( $data ) {
+        // placeholder
+        PayJunction_Tools::log_debug($data);
+    }
+    
+    function process_hosted_payment_relay( $data ) {
         try {
             
             if ( self::valid_relay_response( $data ) ) {
@@ -65,7 +53,36 @@ class WC_Gateway_PayJunction_Response {
             wp_die( $this->customerror, 'Error on Checkout', array( 'response' => 500 ) );
             
         }
+    }
+    
+    function process_response() {
+        if ($this->debugging) {
+            PayJunction_Tools::log_debug("Connection received on callback URL");
+        }
+        $data = array();
+        if (!empty($_POST)) {
+            $data = $_POST;
+        } else {
+            $data = $_GET;
+            if ($this->debugging) {
+                PayJunction_Tools::log_debug("POST body was empty, trying to process from GET parameters");
+            }
+        }
+            
+        if ($this->debugging) {
+            PayJunction_Tools::log_debug("Data received:");
+            PayJunction_Tools::log_debug("\n" . wc_print_r($data, true));
+        }
         
+        self::is_signature_webhook($data)
+            ? $this->process_signature_webhook($data)
+            : $this->process_hosted_payment_relay($data);
+        
+    }
+    
+    static function is_signature_webhook( $data ) {
+        return ! empty($data['type']) &&
+               $data['type'] == 'TRANSACTION_SIGNATURE';
     }
     
     static function valid_relay_response( $response ) {
