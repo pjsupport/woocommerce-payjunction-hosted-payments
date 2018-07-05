@@ -25,13 +25,15 @@ class WC_Gateway_PayJunction_Response {
         $conn = $this->get_api_instance($this->pjlabs);
         $transactionDetail = $conn->get_transaction_details($transactionId);
         $orderId = self::get_wc_order_id_from_transaction_invoice($transactionDetail);
-        $transactionURL = $this->pjlabs 
-            ? "https://www.payjunctionlabs.com/trinity/vt#/transactions/$transactionId/view" : "https://www.payjunction.com/trinity/vt#/transactions/$transactionId/view";
-        try {
-            wc_get_order($orderId)->add_order_note("Signature for order saved: $transactionURL");
-        } catch (Exception $ex) {
-            PayJunction_Tools::log_error($ex->getMessage());
-            PayJunction_Tools::log_error("Order ID was $orderId");
+        if (!empty($orderId)) {
+            $transactionURL = $this->pjlabs 
+                ? "https://www.payjunctionlabs.com/trinity/vt#/transactions/$transactionId/view" : "https://www.payjunction.com/trinity/vt#/transactions/$transactionId/view";
+            try {
+                wc_get_order($orderId)->add_order_note("Signature for order saved: $transactionURL");
+            } catch (Exception $ex) {
+                PayJunction_Tools::log_error($ex->getMessage());
+                PayJunction_Tools::log_error("Order ID was $orderId");
+            }
         }
     }
     
