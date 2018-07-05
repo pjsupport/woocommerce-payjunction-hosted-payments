@@ -21,7 +21,18 @@ class WC_Gateway_PayJunction_Response {
     function process_signature_webhook( $data ) {
         // placeholder
         PayJunction_Tools::log_debug('Processing signature webhook');
-        PayJunction_Tools::log_debug($data);
+        $transactionId = $data['data']['transactionId'];
+        $conn = $this->get_api_instance($this->pjlabs);
+        $transactionDetail = $conn->get_transaction_details($transactionId);
+        $orderId = self::get_wc_order_id_from_transaction_invoice($transactionDetail);
+        $transactionURL = $this->pjlabs 
+            ? "https://www.payjunctionlabs.com/trinity/vt#/transactions/$transactionId/view" : "https://www.payjunction.com/trinity/vt#/transactions/$transactionId/view";
+        try {
+            wc_get_order($orderId)->add_order_note("Signature for order saved: $transactionURL");
+        } catch (Exception $ex) {
+            PayJunction_Tools::log_error($ex->getMessage());
+            PayJunction_Tools::log_error("Order ID was $orderId");
+        }
     }
     
     function process_hosted_payment_relay( $data ) {
@@ -71,6 +82,12 @@ class WC_Gateway_PayJunction_Response {
             ? $this->process_signature_webhook($data)
             : $this->process_hosted_payment_relay($data);
         
+    }
+    
+    static function get_wc_order_id_from_transaction_invoice( $transactionDetail ) {
+        $invoice = $transactionDetail->invoiceNumber;
+        $split = explode('#', $invoice);
+        return $split[1];
     }
     
     static function build_array_by_type() {
