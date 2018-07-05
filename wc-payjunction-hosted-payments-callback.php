@@ -20,6 +20,7 @@ class WC_Gateway_PayJunction_Response {
     
     function process_signature_webhook( $data ) {
         // placeholder
+        PayJunction_Tools::log_debug('Processing signature webhook');
         PayJunction_Tools::log_debug($data);
     }
     
@@ -59,15 +60,7 @@ class WC_Gateway_PayJunction_Response {
         if ($this->debugging) {
             PayJunction_Tools::log_debug("Connection received on callback URL");
         }
-        $data = array();
-        if (!empty($_POST)) {
-            $data = $_POST;
-        } else {
-            $data = $_GET;
-            if ($this->debugging) {
-                PayJunction_Tools::log_debug("POST body was empty, trying to process from GET parameters");
-            }
-        }
+        $data = self::build_array_by_type();
             
         if ($this->debugging) {
             PayJunction_Tools::log_debug("Data received:");
@@ -78,6 +71,39 @@ class WC_Gateway_PayJunction_Response {
             ? $this->process_signature_webhook($data)
             : $this->process_hosted_payment_relay($data);
         
+    }
+    
+    static function build_array_by_type() {
+        if (empty($_SERVER['CONTENT_TYPE'])) {
+            PayJunction_Tools::log_error('Cannot build array from received data if the Content-Type header is missing from the request');
+        } else {
+            $type = trim($_SERVER['CONTENT_TYPE']);
+            if (strcasecmp($type, 'application/json') == 0) {
+                return self::build_array_from_json();
+            } else {
+                $data = array();
+                if (!empty($_POST)) {
+                    $data = $_POST;
+                } else {
+                    $data = $_GET;
+                    if ($this->debugging) {
+                        PayJunction_Tools::log_debug("POST body was empty, trying to process from GET parameters");
+                    }
+                }
+                return $data;
+            }
+        }
+    }
+    
+    static function build_array_from_json() {
+        // Get the raw json string from the php://input file stream
+        $raw_data = file_get_contents('php://input');
+        $parsed = json_decode($raw_data, true);
+        if (!is_array($parsed)) {
+            PayJunction_Tools::log_error("Unable to decode the following raw JSON string: " . htmlspecialchars($raw_data));
+        } else {
+            return $parsed;
+        }
     }
     
     static function is_signature_webhook( $data ) {
