@@ -21,7 +21,7 @@ add_action( 'plugins_loaded', 'payjunction_hp_init', 0 );
 function payjunction_hp_init() {
     class WC_PayJunction_HP extends WC_Payment_Gateway {
         
-        const VERSION = "1.0.7";
+        const VERSION = "1.0.8";
         
         const PJ_TESTMODE_META_KEY = '_pj_hp_test_mode';
         const PJ_TESTMODE_TRUE = 'labs';
@@ -370,18 +370,11 @@ function payjunction_hp_init() {
         static function set_amount_tax( &$query_array, $order ) {
             
             $amount_tax = $order->get_total_tax();
-            $amount_shipping_tax = $order->get_shipping_tax();
             
             if ( !empty( $amount_tax ) && (float)$amount_tax > 0 ) {
                 
                 $query_array[ 'need_to_tax' ] = 'Yes';
-                
-                if ( !empty($amount_shipping_tax) && (float)$amount_shipping_tax > 0 ) {
-                    $query_array[ 'tax_amount' ] = self::get_full_tax_amount_formatted( $amount_tax, $amount_shipping_tax );
-                } else {
-                    $query_array[ 'tax_amount' ] = number_format( (float)$amount_tax, 2, '.', '' );
-                }
-                
+                $query_array[ 'tax_amount' ] = number_format( (float)$amount_tax, 2, '.', '' );
             }
             
             return $query_array;
@@ -396,13 +389,6 @@ function payjunction_hp_init() {
                 $query_array[ 's_h_amount'      ] = number_format($amount_shipping, 2, '.', '');
             }
             return $query_array;
-            
-        }
-        
-        static function get_full_tax_amount_formatted( $tax, $shipping_tax ) {
-            
-            $total_tax = $tax + $shipping_tax;
-            return number_format( (float)$total_tax, 2, '.', '' );
             
         }
     }
