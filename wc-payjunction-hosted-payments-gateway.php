@@ -3,7 +3,7 @@
 Plugin Name: PayJunction Hosted Payments Gateway Module for WooCommerce
 Description: Credit Card Processing Module for WooCommerce using the PayJunction Hosted Payments service
 Version: 1.0.8
-Plugin URI: https://company.payjunction.com/support/WooCommerce
+Plugin URI: https://support.payjunction.com/hc/en-us/articles/211732807-WooCommerce
 Author: Matthew E. Cooper
 Author URI: https://www.payjunction.com
 */
